@@ -1,9 +1,9 @@
 import { generateText } from "ai";
 import { inngest } from "./client";
 import { google } from "@ai-sdk/google";
-import {firecrawl} from "@/lib/firecrawl";
+import { firecrawl } from "@/lib/firecrawl";
 
-const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+const URL_REGEX = /https?:\/\/[^\s]+/g;
 
 export const demoGenerate = inngest.createFunction(
   { id: "demo-generate" },
@@ -11,7 +11,7 @@ export const demoGenerate = inngest.createFunction(
   async ({ event, step }) => {
     const { prompt } = event.data as { prompt: string };
 
-    const urls = (await step.run("extract-urls", async () => {
+    const urls = (await step.run("exctract-urls", async () => {
       return prompt.match(URL_REGEX) || [];
     })) as string[];
 
@@ -35,11 +35,12 @@ export const demoGenerate = inngest.createFunction(
       return await generateText({
         model: google("gemini-2.0-flash"),
         prompt: finalPrompt,
+         experimental_telemetry: {
+            isEnabled: true,
+            recordInputs: true,
+            recordOutputs: true
+        }
       });
     });
   },
 );
-
-function async(value: string, index: number, array: string[]): unknown {
-  throw new Error("Function not implemented.");
-}
